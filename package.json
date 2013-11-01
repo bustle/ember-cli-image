@@ -1,0 +1,20 @@
+{
+  "name": "ember-image-views",
+  "version": "0.1.0",
+  "description": "Stateful image views for Ember.js",
+  "main": "ember-image-views.js",
+  "repository": "https://github.com/gdub22/ember-image-views.git",
+  "author": "Garth Poitras",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-jshint": "~0.7.0",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-qunit": "~0.3.0"
+  }
+}
