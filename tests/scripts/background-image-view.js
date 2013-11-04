@@ -68,3 +68,19 @@ asyncTest('error state triggered', 5, function() {
 
   appendView(view);
 });
+
+test('subclasses can modify final src', function() {
+  var subclass = Ember.BackgroundImageView.extend({
+    finalSrc: Ember.computed(function() {
+      return this.get('src') + '?1';
+    }).property('src')
+  });
+
+  var view = subclass.create({
+    src: testRemoteSrc
+  });
+
+  appendView(view);
+
+  equal( view.$().css('background-image'), 'url('+ testRemoteSrc + '?1)', 'src was modified' );
+});

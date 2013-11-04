@@ -18,6 +18,26 @@ Ember.BackgroundImageView = Ember.View.extend( Ember.ImageLoader, {
   classNameBindings: ['loadingClass', 'errorClass'],
 
   /**
+    Url to the image source.
+
+    @property src
+    @type String
+    @default null
+  */
+  src: null,
+
+  /**
+    @private
+    
+    The final image url to load. A buffer to the src, which is
+    useful for subclasses and mixins to modify the base src.
+
+    @property finalSrc
+    @default src
+  */
+  finalSrc: Ember.computed.oneWay('src'),
+
+  /**
     Loading state class name. This can be overriden
     per instance or app wide using Ember.BackgroundImageView.reopen
 
@@ -45,12 +65,12 @@ Ember.BackgroundImageView = Ember.View.extend( Ember.ImageLoader, {
     @default null
   */
   style: Ember.computed(function() {
-    var src = this.get('src');
+    var src = this.get('finalSrc');
     if(src) {
       return Ember.String.fmt('background-image:url("%@");', [src]);
     }
     return null;
-  }).property('src'),
+  }).property('finalSrc'),
 
   /**
     @private
@@ -61,8 +81,8 @@ Ember.BackgroundImageView = Ember.View.extend( Ember.ImageLoader, {
     @method loadImageOnSrcSet
   */
   loadImageOnSrcSet: Ember.observer(function() {
-    this.loadImage(this.get('src'));
-  }, 'src').on('willInsertElement'),
+    this.loadImage(this.get('finalSrc'));
+  }, 'finalSrc').on('willInsertElement'),
 
   /**
     @private

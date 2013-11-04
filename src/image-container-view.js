@@ -16,6 +16,26 @@
 Ember.ImageContainerView = Ember.ContainerView.extend({
   classNames: ['image-view'],
   classNameBindings: ['loadingClass', 'errorClass'],
+  
+  /**
+    Url to the image source.
+
+    @property src
+    @type String
+    @default null
+  */
+  src: null,
+
+  /**
+    @private
+    
+    The final image url to load. A buffer to the src, which is
+    useful for subclasses and mixins to modify the base src.
+
+    @property finalSrc
+    @default src
+  */
+  finalSrc: Ember.computed.oneWay('src'),
 
   /**
     If `background` is true, the container uses a `BackgroundImageView`
@@ -34,7 +54,7 @@ Ember.ImageContainerView = Ember.ContainerView.extend({
     @type Boolean
     @default false
   */
-  isLoading: Ember.computed.alias('imageView.isLoading'),
+  isLoading: Ember.computed.oneWay('imageView.isLoading'),
 
   /**
     Proxy to child image's isError property
@@ -43,7 +63,7 @@ Ember.ImageContainerView = Ember.ContainerView.extend({
     @type Boolean
     @default false
   */
-  isError: Ember.computed.alias('imageView.isError'),
+  isError: Ember.computed.oneWay('imageView.isError'),
 
   /**
     The child image view which is either an img (`ImgView`)
@@ -56,11 +76,13 @@ Ember.ImageContainerView = Ember.ContainerView.extend({
   imageView: Ember.computed(function() {
     if(this.get('background')) {
       return Ember.BackgroundImageView.create({
-        srcBinding: 'parentView.src'
+        srcBinding: 'parentView.src',
+        finalSrcBinding: 'parentView.finalSrc'
       });
     }
     return Ember.ImgView.create({
       srcBinding: 'parentView.src',
+      finalSrcBinding: 'parentView.finalSrc',
       altBinding: 'parentView.alt',
       widthBinding: 'parentView.width',
       heightBinding: 'parentView.height'

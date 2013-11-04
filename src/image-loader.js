@@ -99,7 +99,19 @@ Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
   _onImgError: function(img, e) {
     this.setProperties({ isLoading: false, isError: true });
     this.trigger('becameError', img, e);
-  }
+  },
+
+  /**
+    @private
+    Remove image events when element is destroyed
+    @method _teardown
+  */
+  _teardown: function() {
+    var img = this.get('imageLoader');
+    if(img) {
+      img.onload = img.onerror = null;
+    }
+  }.on('willDestroyElement')
 
 });
 

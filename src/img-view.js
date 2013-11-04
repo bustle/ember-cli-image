@@ -14,8 +14,28 @@
 **/
 Ember.ImgView = Ember.View.extend( Ember.ImageLoader, {
   tagName: 'img',
-  attributeBindings: ['src', 'alt', 'width', 'height'],
+  attributeBindings: ['finalSrc:src', 'alt', 'width', 'height'],
   classNameBindings: ['loadingClass', 'errorClass'],
+
+  /**
+    Url to the image source.
+
+    @property src
+    @type String
+    @default null
+  */
+  src: null,
+
+  /**
+    @private
+    
+    The final image url to load. A buffer to the src, which is
+    useful for subclasses and mixins to modify the base src.
+
+    @property finalSrc
+    @default src
+  */
+  finalSrc: Ember.computed.oneWay('src'),
 
   /**
     Loading state class name. This can be overriden
@@ -73,8 +93,8 @@ Ember.ImgView = Ember.View.extend( Ember.ImageLoader, {
     @method loadImageOnSrcSet
   */
   loadImageOnSrcSet: Ember.observer(function() {
-    this.loadImage(this.get('src'));
-  }, 'src').on('didInsertElement')
+    this.loadImage(this.get('finalSrc'));
+  }, 'finalSrc').on('didInsertElement')
   
 });
 
