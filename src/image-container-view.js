@@ -1,6 +1,6 @@
 /**
   `Ember.ImageContainerView` is a container view with a stateful image 
-  (`Ember.ImgView` or `Ember.BackgroundImageView`) as its sole child.
+  (`Ember.ImgView` or `Ember.BackgroundImageView`) as a child view.
   Class names are updated according to the image's state.
 
   Instances of `ImageContainerView` can be created using the `image` Handlebars helper.
@@ -54,7 +54,7 @@ Ember.ImageContainerView = Ember.ContainerView.extend({
     @type Boolean
     @default false
   */
-  isLoading: Ember.computed.oneWay('imageView.isLoading'),
+  isLoading: Ember.computed.alias('imageView.isLoading'),
 
   /**
     Proxy to child image's isError property
@@ -63,11 +63,18 @@ Ember.ImageContainerView = Ember.ContainerView.extend({
     @type Boolean
     @default false
   */
-  isError: Ember.computed.oneWay('imageView.isError'),
+  isError: Ember.computed.alias('imageView.isError'),
 
   /**
-    The child image view which is either an img (`ImgView`)
-    or `BackgroundImageView` based on the `background` property.
+    @property childViews
+    @type Array
+    @default imageView
+  */
+  childViews: ['imageView'],
+
+  /**
+    The child image view which is either an `ImgView` or 
+    `BackgroundImageView` based on the `background` property.
 
     @property imageView
     @type Ember.View
@@ -90,7 +97,7 @@ Ember.ImageContainerView = Ember.ContainerView.extend({
   }).property('background'),
 
   /**
-    If you would like to present a different child view while
+    If you would like to present a child view while
     the image is loading, define a `loadingView`
 
     @property loadingView
@@ -100,21 +107,30 @@ Ember.ImageContainerView = Ember.ContainerView.extend({
   loadingView: null,
 
   /**
-    Returns a sole child view which is either an image view,
-    or loading view (if specified)
+   @private
+   Creates an instance of the loadingView if set as a string.
+   Adds observer to add/remove the loading view upon loading state change.
 
-    @property childViews
-    @type Array
+   @method _setupLoadingView
   */
-  childViews: Ember.computed(function() {
-    var loadingView = this.get('loadingView'), view;
-    if(this.get('isLoading') && loadingView) {
-      view = loadingView;
-    } else {
-      view = this.get('imageView');
+  _setupLoadingView: Ember.on('init', function() {
+    var loadingView = this.get('loadingView');
+
+    if(loadingView) {
+      if('string' === typeof loadingView) {
+        loadingView = Ember.get(Ember.lookup, loadingView).create();
+        this.set('loadingView', loadingView);
+      }
+
+      this.addObserver('isLoading', this, function(sender, key) {
+        if(sender.get(key)) {
+          this.pushObject(loadingView);
+        } else {
+          this.removeObject(loadingView);
+        }
+      });
     }
-    return [view];
-  }).property('isLoading', 'loadingView', 'imageView'),
+  }),
 
   /**
     Loading state class name. This can be overriden

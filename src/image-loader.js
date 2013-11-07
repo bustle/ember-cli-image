@@ -49,6 +49,7 @@ Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
   loadImage: function(src) {
     var mixin = this,
         img = this.get('imageLoader');
+
     if(src) {
       this.setProperties({ isLoading: true, isError: false });
       img.onload  = function(e) { Ember.run(this, function() { mixin._onImgLoad(this, e); }); };
