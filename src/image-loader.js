@@ -82,6 +82,20 @@ Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
   },
   
   /**
+    Unsets Reference to the Image Loader.
+    Calling App.reset() or similar will cause a "set on destroyed object"
+    error unless this reference is unset.
+
+    @method unsetImageLoad
+  */
+  unsetImageLoader: function() {
+    img = this.get('imageLoader');
+    img.onload = null;
+    img.onerror = null;
+    this.set('imageLoader', null);
+  }.on('willDestroyElement'),
+  
+  /**
     @private
     Internal onload event handler
     @method _onImgLoad
