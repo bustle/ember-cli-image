@@ -15,14 +15,14 @@ module.exports = function(grunt) {
                   ' */\n',
 
     wrapClosure: {
-      header: '(function(window, Ember, undefined){\n\n' +
+      header: '(function(Ember){\n\n' +
               '"use strict";\n\n',
-      footer: '\n})(this, Ember);'
+      footer: '\n})(Ember);'
     },
 
     jshint: {
-      beforeconcat: ['Gruntfile.js', 'src/**/*.js'],
-      afterconcat: ['<%= pkg.name %>.js']
+      beforeconcat: ['Gruntfile.js', 'src/**/*.js', 'addons/**/*.js'],
+      afterconcat: ['dist/<%= pkg.name %>.js']
     },
 
     concat: {
@@ -34,20 +34,13 @@ module.exports = function(grunt) {
 
       dist: {
         src: [
+          'src/image-state.js',
           'src/image-loader.js',
-          'src/img-view.js',
+          'src/image-view.js',
           'src/background-image-view.js',
           'src/image-container-view.js'
         ],
-        dest: '<%= pkg.name %>.js'
-      }
-    },
-
-    uglify: {
-      dist: {
-        files: {
-          '<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>']
-        }
+        dest: 'dist/<%= pkg.name %>.js'
       }
     },
 
@@ -58,7 +51,6 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-qunit');
 
   // Build task
@@ -67,13 +59,11 @@ module.exports = function(grunt) {
   // Test task
   grunt.registerTask('test', ['qunit']);
 
-  // Package task
-  grunt.registerTask('package', ['uglify']);
 
   // Travis CI task
   grunt.registerTask('travis', ['build', 'test']);
 
   // Default task: all
-  grunt.registerTask('default', ['build', 'test', 'package']);
+  grunt.registerTask('default', ['build', 'test']);
 
 };

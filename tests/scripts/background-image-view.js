@@ -31,7 +31,8 @@ test('can create via handlebars helper', function() {
   equal(imgViews.css('background-image'), 'url('+testRemoteSrc+')', 'src attribute rendered as background-image');
 });
 
-asyncTest('loaded state triggered', 5, function() {
+asyncTest('loaded state triggered', function() {
+  expect(5);
   var view = Ember.BackgroundImageView.create({
     src: testRemoteSrc
   });
@@ -41,16 +42,17 @@ asyncTest('loaded state triggered', 5, function() {
     ok( !view.get('isLoading'), 'not in loading state' );
     ok( !view.get('isError'), 'not in error state' );
     afterRender(function() {
-      ok( !view.$().hasClass(view.get('loadingClassName')), 'view does not have loading class' );
-      ok( !view.$().hasClass(view.get('errorClassName')), 'view does not have error class' );
+      ok( !view.$().hasClass(view.get('loadingClass')), 'view does not have loading class' );
+      ok( !view.$().hasClass(view.get('errorClass')), 'view does not have error class' );
+      start();
     });
-    start();
   });
 
   appendView(view);
 });
 
-asyncTest('error state triggered', 5, function() {
+asyncTest('error state triggered', function() {
+  expect(5);
   var view = Ember.BackgroundImageView.create({
     src: testSrcInvalid
   });
@@ -60,10 +62,10 @@ asyncTest('error state triggered', 5, function() {
     ok( view.get('isError'), 'in error state' );
     ok( !view.get('isLoading'), 'not in loading state' );
     afterRender(function() {
-      ok( view.$().hasClass(view.get('errorClassName')), 'view has error class' );
-      ok( !view.$().hasClass(view.get('loadingClassName')), 'view does not have loading class' );
+      ok( view.$().hasClass(view.get('errorClass')), 'view has error class' );
+      ok( !view.$().hasClass(view.get('loadingClass')), 'view does not have loading class' );
+      start();
     });
-    start();
   });
 
   appendView(view);
@@ -71,7 +73,7 @@ asyncTest('error state triggered', 5, function() {
 
 test('subclasses can modify final src', function() {
   var subclass = Ember.BackgroundImageView.extend({
-    finalSrc: Ember.computed(function() {
+    _src: Ember.computed(function() {
       return this.get('src') + '?1';
     }).property('src')
   });

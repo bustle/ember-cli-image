@@ -1,34 +1,29 @@
 /**
-  `Ember.ImageLoader` is a Mixin that loads images while keeping
-  state and triggering events along the image's lifecycle.
-
-  Typically useful for remote images, but can be used for local images.
+  `ImageLoader` is a Mixin to load images and handle state changes from
+  native javascript image events.
 
   @class ImageLoader
-  @namespace Ember
   @uses Ember.Evented
+  @uses ImageState
 **/
-Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
+var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
   /**
-    Image is currently in the loading state,
-    meaning its onload or onerror event hasn't
-    been triggered after setting the src.
-
-    @property isLoading
-    @type Boolean
-    @default false
+    @property src
+    @type String
+    @default null
   */
-  isLoading: false,
+  src: null,
 
   /**
-    Image is currently in the error state,
-    meaning its onerror was triggered after setting the src.
+    @private
+    
+    The final image src load. A buffer to the src, which is
+    useful for subclasses and mixins to modify the base src.
 
-    @property isError
-    @type Boolean
-    @default false
+    @property _src
+    @default src
   */
-  isError: false,
+  _src: Ember.computed.oneWay('src'),
 
   /**
     JavaScript Image Object used to do the loading.
@@ -37,7 +32,7 @@ Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
     @type Image
     @default Image
   */
-  imageLoader: Ember.computed(function() { return new Image(); }).property(),
+  imageLoader: Ember.computed(function() { return new Image(); }),
 
   /**
     Loads an image with the given src url.
@@ -47,17 +42,19 @@ Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
     @param {String} image source url
   */
   loadImage: function(src) {
-    var mixin = this,
-        img = this.get('imageLoader');
-
     if(src) {
-      this.setProperties({ isLoading: true, isError: false });
-      img.onload  = function(e) { Ember.run(this, function() { mixin._onImgLoad(this, e); }); };
-      img.onerror = function(e) { Ember.run(this, function() { mixin._onImgError(this, e); }); };
-      img.src = src;
-      // If the image is already cached in the browser, don't enter loading state.
-      if(img.complete || img.naturalWidth !== 0) {
-        this.set('isLoading', false);
+      var mixin = this;
+      var img = this.get('imageLoader');
+
+      if (img) {
+        this.setProperties({ isLoading: true, isError: false });
+        img.onload  = function(e) { Ember.run(this, function() { mixin._onImgLoad(this, e); }); };
+        img.onerror = function(e) { Ember.run(this, function() { mixin._onImgError(this, e); }); };
+        img.src = src;
+        // If the image is already cached in the browser
+        if(img.complete || img.naturalWidth !== 0) {
+          this.set('isLoading', false);
+        }
       }
     }
   },
@@ -77,7 +74,7 @@ Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
       var img = this.get('imageLoader');
       if(img) {
         img.onload = img.onerror = null;
-        img.src = Ember.ImageLoader._blankImg;
+        img.src = ImageLoader._blankImg;
       }
     }
   },
@@ -104,13 +101,25 @@ Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
 
   /**
     @private
+    
+    Load the image on willinsertElement and whenever the src is changed.
+
+    @method loadImageOnSrcSet
+  */
+  _loadImageOnSrcSet: Ember.observer('src', function() {
+    this.loadImage(this.get('_src'));
+  }).on('willInsertElement'),
+
+  /**
+    @private
     Remove image events when element is destroyed
     @method _teardownLoader
   */
   _teardownLoader: Ember.on('willDestroyElement', function() {
     var img = this.get('imageLoader');
     if(img) {
-      img.onload = img.onerror = null;
+      img = img.onload = img.onerror = null;
+      this.set('imageLoader', null);
     }
   })
 
@@ -121,5 +130,4 @@ Ember.ImageLoader = Ember.Mixin.create( Ember.Evented, {
   Smallest possible image data uri. 1x1px transparent gif.
   Used to cancel a image request in progress.
   */
-Ember.ImageLoader._blankImg = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-
+ImageLoader._blankImg = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';

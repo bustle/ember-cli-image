@@ -12,11 +12,11 @@ afterRender = function(callback) {
 
 //-----------------------------------------------------------
 
-module('Ember.ImgView');
+module('Ember.ImageView');
 
 test('can create img view', function() {
-  var view = Ember.ImgView.create();
-  ok( view, 'ImgView created' );
+  var view = Ember.ImageView.create();
+  ok( view, 'ImageView created' );
 });
 
 test('can create via handlebars helper', function() {
@@ -28,16 +28,17 @@ test('can create via handlebars helper', function() {
 
   appendView(view);
 
-  var imgViews = view.$().find('img');
-  equal(imgViews.length, 1, 'helper rendered an instance of the view');
-  equal(imgViews.attr('src'), testRemoteSrc, 'src attribute rendered');
-  equal(imgViews.attr('alt'), testAlt, 'alt attribute rendered');
-  equal(imgViews.attr('width'), testW, 'width attribute rendered');
-  equal(imgViews.attr('height'), testH, 'height attribute rendered');
+  var ImageViews = view.$().find('img');
+  equal(ImageViews.length, 1, 'helper rendered an instance of the view');
+  equal(ImageViews.attr('src'), testRemoteSrc, 'src attribute rendered');
+  equal(ImageViews.attr('alt'), testAlt, 'alt attribute rendered');
+  equal(ImageViews.attr('width'), testW, 'width attribute rendered');
+  equal(ImageViews.attr('height'), testH, 'height attribute rendered');
 });
 
-asyncTest('loaded state triggered', 5, function() {
-  var view = Ember.ImgView.create({
+asyncTest('loaded state triggered', function() {
+  expect(5);
+  var view = Ember.ImageView.create({
     src: testRemoteSrc
   });
 
@@ -46,17 +47,18 @@ asyncTest('loaded state triggered', 5, function() {
     ok( !view.get('isLoading'), 'not in loading state' );
     ok( !view.get('isError'), 'not in error state' );
     afterRender(function() {
-      ok( !view.$().hasClass(view.get('loadingClassName')), 'view does not have loading class' );
-      ok( !view.$().hasClass(view.get('errorClassName')), 'view does not have error class' );
+      ok( !view.$().hasClass(view.get('loadingClass')), 'view does not have loading class' );
+      ok( !view.$().hasClass(view.get('errorClass')), 'view does not have error class' );
+      start();
     });
-    start();
   });
 
   appendView(view);
 });
 
-asyncTest('error state triggered', 5, function() {
-  var view = Ember.ImgView.create({
+asyncTest('error state triggered', function() {
+  expect(5);
+  var view = Ember.ImageView.create({
     src: testSrcInvalid
   });
 
@@ -65,18 +67,18 @@ asyncTest('error state triggered', 5, function() {
     ok( view.get('isError'), 'in error state' );
     ok( !view.get('isLoading'), 'not in loading state' );
     afterRender(function() {
-      ok( view.$().hasClass(view.get('errorClassName')), 'view has error class' );
-      ok( !view.$().hasClass(view.get('loadingClassName')), 'view does not have loading class' );
+      ok( view.$().hasClass(view.get('errorClass')), 'view has error class' );
+      ok( !view.$().hasClass(view.get('loadingClass')), 'view does not have loading class' );
+      start();
     });
-    start();
   });
 
   appendView(view);
 });
 
 test('subclasses can modify final src', function() {
-  var subclass = Ember.ImgView.extend({
-    finalSrc: Ember.computed(function() {
+  var subclass = Ember.ImageView.extend({
+    _src: Ember.computed(function() {
       return this.get('src') + '?1';
     }).property('src')
   });
