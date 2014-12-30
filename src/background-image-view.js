@@ -12,7 +12,6 @@
   @uses ImageLoader
 **/
 var BackgroundImageView = Ember.View.extend( ImageLoader, {
-  tagName: 'div',
   attributeBindings: ['style'],
   classNames: ['background-image'],
   style: Ember.computed('_src', function() {

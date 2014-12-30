@@ -41,11 +41,11 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
     @method loadImage
     @param {String} image source url
   */
-  loadImage: function(src) {
+  loadImage: function() {
+    var src = this.get('_src');
+    var mixin = this, img;
     if(src) {
-      var mixin = this;
-      var img = this.get('imageLoader');
-
+      img = this.get('imageLoader');
       if (img) {
         this.setProperties({ isLoading: true, isError: false });
         img.onload  = function(e) { Ember.run(this, function() { mixin._onImgLoad(this, e); }); };
@@ -101,14 +101,21 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
 
   /**
     @private
-    
-    Load the image on willinsertElement and whenever the src is changed.
-
-    @method loadImageOnSrcSet
+    Reload the image whenever the src is changed.
+    @method _loadImageOnSrcChange
   */
-  _loadImageOnSrcSet: Ember.observer('src', function() {
-    this.loadImage(this.get('_src'));
-  }).on('willInsertElement'),
+  _loadImageOnSrcChange: Ember.observer('src', function() {
+    this.loadImage();
+  }),
+
+  /**
+    @private
+    Load the image when the view is initially about to be inserted in DOM
+    @method _loadImageOnInsert
+  */
+  _loadImageOnInsert: Ember.on('willInsertElement', function() {
+    this.loadImage();
+  }),
 
   /**
     @private

@@ -63,6 +63,8 @@
   // Apply Imgix mixin to image views
   Ember.ImageView.reopen( ImgixMixin );
   Ember.ImageView.reopenClass( ImgixMixinStatic );
+  Ember.BackgroundImageView.reopen( ImgixMixin );
+  Ember.BackgroundImageView.reopenClass( ImgixMixinStatic );
   Ember.ImageContainerView.reopen( ImgixMixin );
   Ember.ImageContainerView.reopenClass( ImgixMixinStatic );
 
