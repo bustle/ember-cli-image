@@ -105,26 +105,35 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
   imageLoader: Ember.computed(function() { return new Image(); }),
 
   /**
-    Loads an image with the given src url.
-    Triggers events on native Image callbacks.
-
+    Loads the image src using native javascript Image object
     @method loadImage
-    @param {String} image source url
   */
   loadImage: function() {
     var src = this.get('_src');
-    var mixin = this, img;
+    var component = this, img;
+
     if(src) {
       img = this.get('imageLoader');
       if (img) {
+        img.src = ''; // needed for onload to be called if reusing the same image object
+        this.trigger('willLoad', src);
         this.setProperties({ isLoading: true, isError: false });
-        img.onload  = function(e) { Ember.run(this, function() { mixin._onImgLoad(this, e); }); };
-        img.onerror = function(e) { Ember.run(this, function() { mixin._onImgError(this, e); }); };
+
+        img.onload  = function(e) { 
+          Ember.run(function() {
+            component.setProperties({ isLoading: false, isError: false });
+            component.trigger('didLoad', img, e);
+          });
+        };
+        
+        img.onerror = function(e) {
+          Ember.run(function() {
+            component.setProperties({ isLoading: false, isError: true });
+            component.trigger('becameError', img, e);
+          });
+        };
+
         img.src = src;
-        // If the image is already cached in the browser
-        if(img.complete || img.naturalWidth !== 0) {
-          this.set('isLoading', false);
-        }
       }
     }
   },
@@ -148,26 +157,6 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
       }
     }
   },
-  
-  /**
-    @private
-    Internal onload event handler
-    @method _onImgLoad
-  */
-  _onImgLoad: function(img, e) {
-    this.setProperties({ isLoading: false, isError: false });
-    this.trigger('didLoad', img, e);
-  },
-
-  /**
-    @private
-    Internal onerror event handler
-    @method _onImgError
-  */
-  _onImgError: function(img, e) {
-    this.setProperties({ isLoading: false, isError: true });
-    this.trigger('becameError', img, e);
-  },
 
   /**
     @private
@@ -180,10 +169,10 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
 
   /**
     @private
-    Load the image when the view is initially about to be inserted in DOM
+    Load the image when the view is initially inserted into DOM
     @method _loadImageOnInsert
   */
-  _loadImageOnInsert: Ember.on('willInsertElement', function() {
+  _loadImageOnInsert: Ember.on('didInsertElement', function() {
     this.loadImage();
   }),
 
