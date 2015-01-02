@@ -3,15 +3,18 @@
  * Stateful image views for Ember.js
  *
  * version: 0.2.0
- * last modifed: 2014-12-30
+ * last modifed: 2015-01-16
  *
  * Garth Poitras <garth22@gmail.com>
- * Copyright 2014 (c) Garth Poitras
+ * Copyright 2015 (c) Garth Poitras
  */
 
 (function(Ember){
 
 "use strict";
+
+
+var reads = Ember.computed.reads;
 
 /**
   `ImageState` is a Mixin to track image loading/error state
@@ -21,6 +24,21 @@
 **/
 var ImageState = Ember.Mixin.create({
   classNameBindings: ['_loadingClass', '_errorClass'],
+
+  /**
+    @property src
+    @type String
+    @default null
+  */
+  src: null,
+
+  /**
+    @property url
+    @type String
+    @default src
+    The final src to load. Gives mixins a chance to modify src
+  */
+  url: reads('src'),
 
   /**
     @property isLoading
@@ -78,24 +96,6 @@ var ImageState = Ember.Mixin.create({
 **/
 var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
   /**
-    @property src
-    @type String
-    @default null
-  */
-  src: null,
-
-  /**
-    @private
-    
-    The final image src load. A buffer to the src, which is
-    useful for subclasses and mixins to modify the base src.
-
-    @property _src
-    @default src
-  */
-  _src: Ember.computed.oneWay('src'),
-
-  /**
     JavaScript Image Object used to do the loading.
 
     @property imageLoader
@@ -109,17 +109,16 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
     @method loadImage
   */
   loadImage: function() {
-    var src = this.get('_src');
+    var url = this.get('url');
     var component = this, img;
 
-    if(src) {
+    if(url) {
       img = this.get('imageLoader');
       if (img) {
-        img.src = ''; // needed for onload to be called if reusing the same image object
-        this.trigger('willLoad', src);
+        this.trigger('willLoad', url);
         this.setProperties({ isLoading: true, isError: false });
 
-        img.onload  = function(e) { 
+        img.onload = function(e) { 
           Ember.run(function() {
             component.setProperties({ isLoading: false, isError: false });
             component.trigger('didLoad', img, e);
@@ -133,47 +132,54 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
           });
         };
 
-        img.src = src;
+        img.src = url;
       }
     }
   },
 
   /**
     Cancels a pending image request.
-    Changing the src successfully aborts the previous request. (use empty gif data uri)
-    Notes:
-    - Removing img from the DOM does not cancel an img http request.
-    - Setting img src to null has unexpected results cross-browser.
-
     @method cancelImageLoad
   */
   cancelImageLoad: function() {
     if(this.get('isLoading')) {
       this.setProperties({ isLoading: false, isError: false });
-      var img = this.get('imageLoader');
-      if(img) {
-        img.onload = img.onerror = null;
-        img.src = ImageLoader._blankImg;
-      }
+      this.clearImage();
     }
   },
 
   /**
-    @private
-    Reload the image whenever the src is changed.
-    @method _loadImageOnSrcChange
+   * Clears an image to a blank state.
+   * Useful for canceling, or when swapping urls
+    Notes:
+    - Removing img from the DOM does not cancel an img http request.
+    - Setting img src to null has unexpected results cross-browser.
+   */
+  clearImage: function() {
+    var img = this.get('imageLoader');
+    if(img) {
+      img.onload = img.onerror = null;
+      img.src = ImageLoader._blankImg;
+    }
+  },
+
+  /**
+    Loads the image when the view is initially inserted
+    @method loadImageOnInsert
   */
-  _loadImageOnSrcChange: Ember.observer('src', function() {
-    this.loadImage();
+  loadImageOnInsert: Ember.on('didInsertElement', function() {
+    Ember.run.scheduleOnce('afterRender', this, this.loadImage);
   }),
 
   /**
-    @private
-    Load the image when the view is initially inserted into DOM
-    @method _loadImageOnInsert
+    Load or reload the image whenever the url is set.
+    @method loadImageOnUrlSet
   */
-  _loadImageOnInsert: Ember.on('didInsertElement', function() {
-    this.loadImage();
+  loadImageOnUrlSet: Ember.observer('url', function() {
+    Ember.run.scheduleOnce('afterRender', this, function() {
+      this.clearImage();
+      this.loadImage();
+    });
   }),
 
   /**
@@ -213,14 +219,14 @@ ImageLoader._blankImg = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAA
 **/
 var ImageView = Ember.View.extend( ImageLoader, {
   tagName: 'img',
-  attributeBindings: ['_src:src', 'alt', 'width', 'height'],
+  attributeBindings: ['alt', 'width', 'height'],
 
   /**
     @property imageLoader
     @type Object
     @default element
   */
-  imageLoader: Ember.computed.oneWay('element'),
+  imageLoader: reads('element'),
 
   /**
     @private
@@ -257,12 +263,11 @@ Ember.ImageView = ImageView;
 var BackgroundImageView = Ember.View.extend( ImageLoader, {
   attributeBindings: ['style'],
   classNames: ['background-image'],
-  style: Ember.computed('_src', function() {
-    var src = this.get('_src');
-    if(src) {
-      return 'background-image:url("' + src + '")';
+  applyStyle: function(url) {
+    if(url) {
+      this.set('style', 'background-image:url("' + url + '")');
     }
-  })
+  }.on('willLoad')
 });
 
 // Add `{{background-image}}` Handlebars helper.
@@ -270,6 +275,20 @@ Ember.Handlebars.helper('background-image', BackgroundImageView);
 
 // Add to namespace
 Ember.BackgroundImageView = BackgroundImageView;
+
+/**
+ * Child ImageView classes specifically for container views
+ */
+var ImageChildView = ImageView.extend({
+  url: reads('parentView.url'),
+  alt: reads('parentView.alt'),
+  width: reads('parentView.width'),
+  height: reads('parentView.height')
+});
+
+var BackgroundImageChildView = BackgroundImageView.extend({
+  url: reads('parentView.url')
+});
 
 /**
   `ImageContainerView` is a container view with a stateful image 
@@ -291,26 +310,6 @@ var ImageContainerView = Ember.ContainerView.extend( ImageState, {
   errorClass: 'image-error',
   
   /**
-    Url to the image source.
-
-    @property src
-    @type String
-    @default null
-  */
-  src: null,
-
-  /**
-    @private
-    
-    The final image url to load. A buffer to the src, which is
-    useful for subclasses and mixins to modify the base src.
-
-    @property _src
-    @default src
-  */
-  _src: Ember.computed.oneWay('src'),
-
-  /**
     If `background` is true, the container uses a `BackgroundImageView`
     as its child image view instead of the default `ImgView`
 
@@ -327,7 +326,7 @@ var ImageContainerView = Ember.ContainerView.extend( ImageState, {
     @type Boolean
     @default false
   */
-  isLoading: Ember.computed.oneWay('imageView.isLoading'),
+  isLoading: reads('imageView.isLoading'),
 
   /**
     Proxy to child image's isError property
@@ -336,7 +335,7 @@ var ImageContainerView = Ember.ContainerView.extend( ImageState, {
     @type Boolean
     @default false
   */
-  isError: Ember.computed.oneWay('imageView.isError'),
+  isError: reads('imageView.isError'),
 
   /**
     The child image view which is either an `ImageView` or 
@@ -348,18 +347,9 @@ var ImageContainerView = Ember.ContainerView.extend( ImageState, {
   */
   imageView: Ember.computed('background', function() {
     if(this.get('background')) {
-      return BackgroundImageView.create({
-        srcBinding: 'parentView.src',
-        _srcBinding: 'parentView._src'
-      });
+      return BackgroundImageChildView.create();
     }
-    return ImageView.create({
-      srcBinding: 'parentView.src',
-      _srcBinding: 'parentView._src',
-      altBinding: 'parentView.alt',
-      widthBinding: 'parentView.width',
-      heightBinding: 'parentView.height'
-    });
+    return ImageChildView.create();
   }),
 
   /**

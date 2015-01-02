@@ -34,6 +34,7 @@ module.exports = function(grunt) {
 
       dist: {
         src: [
+          'src/index.js',
           'src/image-state.js',
           'src/image-loader.js',
           'src/image-view.js',

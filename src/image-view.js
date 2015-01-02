@@ -13,14 +13,14 @@
 **/
 var ImageView = Ember.View.extend( ImageLoader, {
   tagName: 'img',
-  attributeBindings: ['_src:src', 'alt', 'width', 'height'],
+  attributeBindings: ['alt', 'width', 'height'],
 
   /**
     @property imageLoader
     @type Object
     @default element
   */
-  imageLoader: Ember.computed.oneWay('element'),
+  imageLoader: reads('element'),
 
   /**
     @private

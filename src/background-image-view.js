@@ -14,12 +14,12 @@
 var BackgroundImageView = Ember.View.extend( ImageLoader, {
   attributeBindings: ['style'],
   classNames: ['background-image'],
-  style: Ember.computed('_src', function() {
-    var src = this.get('_src');
-    if(src) {
-      return 'background-image:url("' + src + '")';
+  applyStyle: function(url) {
+    if(url) {
+      var backgroundImageStyle = 'background-image:url("' + url + '")';
+      this.set('style', backgroundImageStyle.htmlSafe());
     }
-  })
+  }.on('willLoad')
 });
 
 // Add `{{background-image}}` Handlebars helper.

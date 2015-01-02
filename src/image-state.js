@@ -8,6 +8,21 @@ var ImageState = Ember.Mixin.create({
   classNameBindings: ['_loadingClass', '_errorClass'],
 
   /**
+    @property src
+    @type String
+    @default null
+  */
+  src: null,
+
+  /**
+    @property url
+    @type String
+    @default src
+    The final src to load. Gives mixins a chance to modify src
+  */
+  url: reads('src'),
+
+  /**
     @property isLoading
     @type Boolean
     @default if the src is initially set

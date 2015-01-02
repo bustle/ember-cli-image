@@ -1,4 +1,18 @@
 /**
+ * Child ImageView classes specifically for container views
+ */
+var ImageChildView = ImageView.extend({
+  url: reads('parentView.url'),
+  alt: reads('parentView.alt'),
+  width: reads('parentView.width'),
+  height: reads('parentView.height')
+});
+
+var BackgroundImageChildView = BackgroundImageView.extend({
+  url: reads('parentView.url')
+});
+
+/**
   `ImageContainerView` is a container view with a stateful image 
   (`ImageView` or `BackgroundImageView`) as a child view.
   Class names are updated according to the image's state.
@@ -18,26 +32,6 @@ var ImageContainerView = Ember.ContainerView.extend( ImageState, {
   errorClass: 'image-error',
   
   /**
-    Url to the image source.
-
-    @property src
-    @type String
-    @default null
-  */
-  src: null,
-
-  /**
-    @private
-    
-    The final image url to load. A buffer to the src, which is
-    useful for subclasses and mixins to modify the base src.
-
-    @property _src
-    @default src
-  */
-  _src: Ember.computed.oneWay('src'),
-
-  /**
     If `background` is true, the container uses a `BackgroundImageView`
     as its child image view instead of the default `ImgView`
 
@@ -54,7 +48,7 @@ var ImageContainerView = Ember.ContainerView.extend( ImageState, {
     @type Boolean
     @default false
   */
-  isLoading: Ember.computed.oneWay('imageView.isLoading'),
+  isLoading: reads('imageView.isLoading'),
 
   /**
     Proxy to child image's isError property
@@ -63,7 +57,7 @@ var ImageContainerView = Ember.ContainerView.extend( ImageState, {
     @type Boolean
     @default false
   */
-  isError: Ember.computed.oneWay('imageView.isError'),
+  isError: reads('imageView.isError'),
 
   /**
     The child image view which is either an `ImageView` or 
@@ -75,18 +69,9 @@ var ImageContainerView = Ember.ContainerView.extend( ImageState, {
   */
   imageView: Ember.computed('background', function() {
     if(this.get('background')) {
-      return BackgroundImageView.create({
-        srcBinding: 'parentView.src',
-        _srcBinding: 'parentView._src'
-      });
+      return BackgroundImageChildView.create();
     }
-    return ImageView.create({
-      srcBinding: 'parentView.src',
-      _srcBinding: 'parentView._src',
-      altBinding: 'parentView.alt',
-      widthBinding: 'parentView.width',
-      heightBinding: 'parentView.height'
-    });
+    return ImageChildView.create();
   }),
 
   /**

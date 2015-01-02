@@ -8,24 +8,6 @@
 **/
 var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
   /**
-    @property src
-    @type String
-    @default null
-  */
-  src: null,
-
-  /**
-    @private
-    
-    The final image src load. A buffer to the src, which is
-    useful for subclasses and mixins to modify the base src.
-
-    @property _src
-    @default src
-  */
-  _src: Ember.computed.oneWay('src'),
-
-  /**
     JavaScript Image Object used to do the loading.
 
     @property imageLoader
@@ -39,17 +21,16 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
     @method loadImage
   */
   loadImage: function() {
-    var src = this.get('_src');
+    var url = this.get('url');
     var component = this, img;
 
-    if(src) {
+    if(url) {
       img = this.get('imageLoader');
       if (img) {
-        img.src = ''; // needed for onload to be called if reusing the same image object
-        this.trigger('willLoad', src);
+        this.trigger('willLoad', url);
         this.setProperties({ isLoading: true, isError: false });
 
-        img.onload  = function(e) { 
+        img.onload = function(e) { 
           Ember.run(function() {
             component.setProperties({ isLoading: false, isError: false });
             component.trigger('didLoad', img, e);
@@ -63,47 +44,54 @@ var ImageLoader = Ember.Mixin.create( Ember.Evented, ImageState, {
           });
         };
 
-        img.src = src;
+        img.src = url;
       }
     }
   },
 
   /**
     Cancels a pending image request.
-    Changing the src successfully aborts the previous request. (use empty gif data uri)
-    Notes:
-    - Removing img from the DOM does not cancel an img http request.
-    - Setting img src to null has unexpected results cross-browser.
-
     @method cancelImageLoad
   */
   cancelImageLoad: function() {
     if(this.get('isLoading')) {
       this.setProperties({ isLoading: false, isError: false });
-      var img = this.get('imageLoader');
-      if(img) {
-        img.onload = img.onerror = null;
-        img.src = ImageLoader._blankImg;
-      }
+      this.clearImage();
     }
   },
 
   /**
-    @private
-    Reload the image whenever the src is changed.
-    @method _loadImageOnSrcChange
+   * Clears an image to a blank state.
+   * Useful for canceling, or when swapping urls
+    Notes:
+    - Removing img from the DOM does not cancel an img http request.
+    - Setting img src to null has unexpected results cross-browser.
+   */
+  clearImage: function() {
+    var img = this.get('imageLoader');
+    if(img) {
+      img.onload = img.onerror = null;
+      img.src = ImageLoader._blankImg;
+    }
+  },
+
+  /**
+    Loads the image when the view is initially inserted
+    @method loadImageOnInsert
   */
-  _loadImageOnSrcChange: Ember.observer('src', function() {
-    this.loadImage();
+  loadImageOnInsert: Ember.on('didInsertElement', function() {
+    Ember.run.scheduleOnce('afterRender', this, this.loadImage);
   }),
 
   /**
-    @private
-    Load the image when the view is initially inserted into DOM
-    @method _loadImageOnInsert
+    Load or reload the image whenever the url is set.
+    @method loadImageOnUrlSet
   */
-  _loadImageOnInsert: Ember.on('didInsertElement', function() {
-    this.loadImage();
+  loadImageOnUrlSet: Ember.observer('url', function() {
+    Ember.run.scheduleOnce('afterRender', this, function() {
+      this.clearImage();
+      this.loadImage();
+    });
   }),
 
   /**
