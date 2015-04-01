@@ -33,9 +33,7 @@
   },
   "keywords": [
     "ember-addon",
-    "image-views",
-    "image",
-    "lazy-load"
+    "image-views"
   ],
   "dependencies": {
     "ember-cli-babel": "^4.0.0"
