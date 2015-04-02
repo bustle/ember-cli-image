@@ -74,7 +74,7 @@ var ImageLoaderMixin = Ember.Mixin.create( Ember.Evented, ImageStateMixin, {
     var img = this.get('imageLoader');
     if(img) {
       img.onload = img.onerror = null;
-      img.src = ImageLoader._blankImg;
+      img.src = ImageLoaderMixin._blankImg;
     }
   },
 

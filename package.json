@@ -1,7 +1,7 @@
 {
   "name": "ember-cli-image",
-  "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "version": "0.0.1",
+  "description": "Stateful image components for Ember.js",
   "directories": {
     "doc": "doc",
     "test": "tests"
