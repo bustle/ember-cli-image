@@ -1,25 +1,24 @@
 import Ember from 'ember';
 import ImageStateMixin from '../mixins/image-state-mixin';
-import ImageChild from './image-child';
-import BackgroundImageChild from './background-image-child';
+import ChildImgComponent from './internal/child-x-img';
+import ChildBackgroundImageComponent from './internal/child-background-image';
 
 var reads = Ember.computed.reads;
 
 /**
-  `ImageContainer` is a container component with a stateful image
-  (`XImg` or `BackgroundImage`) as a child component.
+  A container component with a stateful image as a child component.
   Class names are updated according to the image's state.
 
-  Instances of `ImageContainer` can be created using the `image` Handlebars helper.
+  Instances of `ImageContainerComponent` can be created using the `image` Handlebars helper.
   ```handlebars
   {{image src="img/image1.jpg" alt="Image" width=100 height=100}}
   ```
 
-  @class ImageContainer
+  @class ImageContainerComponent
   @extends Ember.ContainerView
   @uses ImageStateMixin
 **/
-var ImageContainer = Ember.ContainerView.extend( ImageStateMixin, {
+var ImageContainerComponent = Ember.ContainerView.extend( ImageStateMixin, {
   classNames: ['image-view'],
   loadingClass: 'image-loading',
   errorClass: 'image-error',
@@ -62,9 +61,9 @@ var ImageContainer = Ember.ContainerView.extend( ImageStateMixin, {
   */
   imageView: Ember.computed('background', function() {
     if(this.get('background')) {
-      return BackgroundImageChild.create();
+      return ChildBackgroundImageComponent.create();
     }
-    return ImageChild.create();
+    return ChildImgComponent.create();
   }),
 
   /**
@@ -88,4 +87,4 @@ var ImageContainer = Ember.ContainerView.extend( ImageStateMixin, {
 
 });
 
-export default ImageContainer;
+export default ImageContainerComponent;

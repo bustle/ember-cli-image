@@ -1,9 +1,9 @@
 import Ember from 'ember';
 
-var reads = Ember.computed.reads;
+var computed = Ember.computed;
 
 /**
-  `ImageState` is a Mixin to track image loading/error state
+  Mixin to track image loading/error state
   and update css classes accordingly.
 
   @class ImageState
@@ -25,7 +25,7 @@ var ImageStateMixin = Ember.Mixin.create({
     @default src
     The final src to load. Gives mixins a chance to modify src
   */
-  url: reads('src'),
+  url: computed.reads('src'),
 
   /**
     @property isLoading
@@ -64,11 +64,11 @@ var ImageStateMixin = Ember.Mixin.create({
     @property loadingClass
     @property errorClass
   */
-  _loadingClass: Ember.computed('isLoading', function() {
+  _loadingClass: computed('isLoading', function() {
     if(this.get('isLoading')) { return this.get('loadingClass'); }
   }),
 
-  _errorClass: Ember.computed('isError', function() {
+  _errorClass: computed('isError', function() {
     if(this.get('isError')) { return this.get('errorClass'); }
   })
 });

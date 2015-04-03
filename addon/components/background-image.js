@@ -1,21 +1,23 @@
 import Ember from 'ember';
 import ImageLoaderMixin from '../mixins/image-loader-mixin';
-/**
-  `BackgroundImage` loads a stateful image for its
-  css background-image. Class names are updated according to the image state.
 
-  @class BackgroundImage
+/**
+  Loads a stateful image for its css background-image.
+  Class names are updated according to the image state.
+
+  @class BackgroundImageComponent
   @extends Ember.Component
   @uses ImageLoaderMixin
 **/
-var BackgroundImage = Ember.Component.extend( ImageLoaderMixin, {
+var BackgroundImageComponent = Ember.Component.extend( ImageLoaderMixin, {
   attributeBindings: ['style'],
   classNames: ['background-image'],
-  applyStyle: function(url) {
+  applyStyle: Ember.on('willLoad', function(url) {
     if(url) {
-      this.set('style', 'background-image:url("' + url + '")');
+      var backgroundImageStyle = 'background-image:url("' + url + '")';
+      this.set('style', backgroundImageStyle.htmlSafe());
     }
-  }.on('willLoad')
+  })
 });
 
-export default BackgroundImage;
+export default BackgroundImageComponent;

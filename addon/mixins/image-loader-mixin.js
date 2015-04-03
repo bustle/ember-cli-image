@@ -2,12 +2,19 @@ import Ember from 'ember';
 import ImageStateMixin from './image-state-mixin';
 
 /**
-  `ImageLoader` is a Mixin to load images and handle state changes from
+  @private
+  Smallest possible image data uri. 1x1 px transparent gif.
+  Used to cancel a image request in progress.
+  */
+var blankImg = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+
+/**
+  Mixin to load images and handle state changes from
   native javascript image events.
 
-  @class ImageLoader
+  @class ImageLoaderMixin
   @uses Ember.Evented
-  @uses ImageState
+  @uses ImageStateMixin
 **/
 var ImageLoaderMixin = Ember.Mixin.create( Ember.Evented, ImageStateMixin, {
   /**
@@ -74,7 +81,7 @@ var ImageLoaderMixin = Ember.Mixin.create( Ember.Evented, ImageStateMixin, {
     var img = this.get('imageLoader');
     if(img) {
       img.onload = img.onerror = null;
-      img.src = ImageLoaderMixin._blankImg;
+      img.src = blankImg;
     }
   },
 
@@ -87,7 +94,7 @@ var ImageLoaderMixin = Ember.Mixin.create( Ember.Evented, ImageStateMixin, {
   }),
 
   /**
-    Load or reload the image whenever the url is set.
+    Load an image whenever the url is changed.
     @method loadImageOnUrlSet
   */
   loadImageOnUrlSet: Ember.observer('url', function() {
@@ -111,12 +118,5 @@ var ImageLoaderMixin = Ember.Mixin.create( Ember.Evented, ImageStateMixin, {
   })
 
 });
-
-/**
-  @private
-  Smallest possible image data uri. 1x1px transparent gif.
-  Used to cancel a image request in progress.
-  */
-ImageLoaderMixin._blankImg = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
 export default ImageLoaderMixin;
