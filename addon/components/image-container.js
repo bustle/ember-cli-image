@@ -87,4 +87,7 @@ var ImageContainerComponent = Ember.ContainerView.extend( ImageStateMixin, {
 
 });
 
+// Manually register Handlebars helper since this doesn't extend from Ember.Component
+Ember.Handlebars.helper('image', ImageContainerComponent);
+
 export default ImageContainerComponent;

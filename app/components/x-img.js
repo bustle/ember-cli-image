@@ -1,4 +1,4 @@
 import Ember from 'ember';
-import XImg from 'ember-cli-image/components/x-img';
+import ImgComponent from 'ember-cli-image/components/x-img';
 
-export default XImg;
+export default ImgComponent;
