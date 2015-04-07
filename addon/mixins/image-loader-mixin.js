@@ -1,6 +1,8 @@
 import Ember from 'ember';
 import ImageStateMixin from './image-state-mixin';
 
+var hasDOM = typeof document !== 'undefined';
+
 /**
   @private
   Smallest possible image data uri. 1x1 px transparent gif.
@@ -24,7 +26,10 @@ var ImageLoaderMixin = Ember.Mixin.create( Ember.Evented, ImageStateMixin, {
     @type Image
     @default Image
   */
-  imageLoader: Ember.computed(function() { return new Image(); }),
+  imageLoader: Ember.computed(function() {
+    console.log('ho');
+    return hasDOM && new Image();
+  }),
 
   /**
     Loads the image src using native javascript Image object

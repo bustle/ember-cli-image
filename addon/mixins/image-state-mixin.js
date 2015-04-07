@@ -32,7 +32,7 @@ var ImageStateMixin = Ember.Mixin.create({
     @type Boolean
     @default if the src is initially set
   */
-  isLoading: true,
+  isLoading: false,
 
   /**
     @property isError
