@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import ImgComponent from '../x-img';
+import ImgComponent from '../img-component';
 
 var reads = Ember.computed.reads;
 

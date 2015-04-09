@@ -1,4 +1,4 @@
 import Ember from 'ember';
-import ImageContainerComponent from 'ember-cli-image/components/image-container';
+import ImageContainer from 'ember-cli-image/components/image-container-component';
 
-export default ImageContainerComponent;
+export default ImageContainer;

@@ -1,7 +1,7 @@
 import Ember from 'ember';
 import ImageStateMixin from '../mixins/image-state-mixin';
-import ChildImgComponent from './internal/child-x-img';
-import ChildBackgroundImageComponent from './internal/child-background-image';
+import ChildImgComponent from './internal/child-img-component';
+import ChildBackgroundImageComponent from './internal/child-background-image-component';
 
 var reads = Ember.computed.reads;
 

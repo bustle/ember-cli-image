@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import BackgroundImageComponent from '../background-image';
+import BackgroundImageComponent from '../background-image-component';
 
 /**
  * @private

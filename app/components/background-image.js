@@ -1,4 +1,4 @@
 import Ember from 'ember';
-import BackgroundImageComponent from 'ember-cli-image/components/background-image';
+import BackgroundImage from 'ember-cli-image/components/background-image-component';
 
-export default BackgroundImageComponent;
+export default BackgroundImage;
