@@ -2,12 +2,12 @@ import Ember from 'ember';
 import ImageLoaderMixin from '../mixins/image-loader-mixin';
 
 /**
-  `x-img` renders a stateful `<img>` element whose loading and
+  `img-component` renders a stateful `<img>` element whose loading and
   error states can be observed, and whose class names are updated accordingly.
 
-  Instances of `x-img` can be created using the `img` Handlebars helper.
+  Instances of `img-component` can be created using the `stateful-img` Handlebars helper.
   ```handlebars
-  {{img src="img/image1.jpg" alt="Image" width=100 height=100}}
+  {{stateful-img src="img/image1.jpg" alt="Image" width=100 height=100}}
   ```
 
   @class ImgComponent

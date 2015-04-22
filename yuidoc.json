@@ -1,0 +1,12 @@
+{
+  "name": "ember-cli-image",
+  "description": "Stateful image components for Ember.js",
+  "version": "0.0.1",
+  "options": {
+    "paths": [
+      "addon"
+    ],
+    "exclude": "vendor",
+    "outdir": "docs"
+  }
+}
