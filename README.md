@@ -50,6 +50,7 @@ you require a wrapper around your images for tasks like fading in images as they
 lazily load.
 
 Check out [ember-cli-image-lazy](https://github.com/bustlelabs/ember-cli-image-lazy) for seamlessly enabling lazily-loaded images.
+
 Additionally, if you're using imgix as your image provider take a look at
 [ember-cli-image-imgix](https://github.com/bustlelabs/ember-cli-image-imgix) for imgix integration.
 
