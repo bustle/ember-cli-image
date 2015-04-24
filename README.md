@@ -12,7 +12,7 @@ ember install ember-cli-image
 ```
 or
 ```
-ember install:addon ember-cli-flash
+ember install:addon ember-cli-image
 ```
 
 ## Usage
