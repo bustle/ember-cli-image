@@ -6,13 +6,8 @@ See the [API documentaion](http://bustlelabs.github.io/ember-cli-image/).
 
 ## Installation
 
-For Ember CLI v0.2.3 or higher
 ```
-ember install ember-cli-image
-```
-or
-```
-ember install:addon ember-cli-image
+npm install ember-cli-image
 ```
 
 ## Usage
