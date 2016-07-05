@@ -1,11 +1,7 @@
 {
   "name": "ember-cli-image",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Stateful image components for Ember.js",
-  "directories": {
-    "doc": "doc",
-    "test": "tests"
-  },
   "scripts": {
     "start": "ember server",
     "build": "ember build",
